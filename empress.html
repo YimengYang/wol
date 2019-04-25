@@ -135,6 +135,20 @@
         <button title="WoL homepage" onclick="location.href='https://biocore.github.io/wol/';">&#8962;</button>
         <!-- <button>&#9906;</button> -->
       </p>
+      <!-- Taxonomy -->
+      <button class="side-header collapsible">Layout</button>
+      <div class="side-content control">
+        <!-- select layout -->
+        <p class="layout">
+          <label>Type</label>
+          <input type="radio" id="radial" name="sys" value="r_" onclick="changeLayout('radial')" checked />
+          <label for="radial">Radial</label>
+          &nbsp;
+          <input type="radio" id="circular" name="sys" value="ci_" onclick="changeLayout('circular')" />
+          <label for="circular">Circular</label>
+        </p>
+
+      </div>
 
       <!-- Taxonomy -->
       <button class="side-header collapsible">Taxonomy</button>

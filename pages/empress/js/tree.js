@@ -1,13 +1,17 @@
 class Tree{
-  constructor(tree_nwk, edgeData, metadata, m_headers, maxes){
+  constructor(tree_nwk, edgeData, edgeData_circ, metadata, m_headers, maxes){
+    this.layout = "radial";
     this.tree = tree_nwk;
     this.edgeData = edgeData;
+    this.edgeData_circ = edgeData_circ;
     this.metadata = metadata;
     this.m_headers = m_headers;
     this.max = maxes.dim;
     this.maxes = maxes;
     this.root = 'N1';
-    this.numBranches = Object.keys(metadata).length;
+    this.edgeData_dict = {"radial": edgeData, "circular": edgeData_circ};
+    //this.numBranches = 1000000;
+    this.numBranches = edgeData.length;
     this.triData = [];
     this.triRoots = [];
     this.lastHighTri = 0;
@@ -238,10 +242,14 @@ class Tree{
     const RED = 0;
     const GREEN = 1;
     const BLUE = 2;
+    const SEGX2 = 0;
+    const SEGY2 = 1;
+    const SEGX1 = 2;
+    const SEGY1 = 3;
     let nodeMetadata;
     this.edgeData = new Array((this.numBranches ) * VERT_SIZE);
     for(node in this.metadata) {
-        nodeMetadata = this.metadata[node];
+        nodeMetadata = this.metadata[n\ode];
         if(nodeMetadata['branch_is_visible']) {
             this.edgeData[i + PX] = nodeMetadata["px"];
             this.edgeData[i + PY] = nodeMetadata["py"];
@@ -254,6 +262,24 @@ class Tree{
             this.edgeData[i + G] = nodeMetadata["branch_color"][GREEN]
             this.edgeData[i + B] = nodeMetadata["branch_color"][BLUE]
             i += VERT_SIZE;
+            // Add segments as well
+            if(nodeMetadata["segments"].length != 0){
+              let seg;
+              for (seg in nodeMetadata["segments"]){
+                this.edgeData[i + PX] = seg[SEGX2];
+                this.edgeData[i + PY] = seg[SEGY2];
+                this.edgeData[i + PR] = nodeMetadata["branch_color"][RED];
+                this.edgeData[i + PG] = nodeMetadata["branch_color"][GREEN];
+                this.edgeData[i + PB] = nodeMetadata["branch_color"][BLUE];
+                this.edgeData[i + X] = seg[SEGX1];
+                this.edgeData[i + Y] = seg[SEGY1];
+                this.edgeData[i + R] = nodeMetadata["branch_color"][RED];
+                this.edgeData[i + G] = nodeMetadata["branch_color"][GREEN]
+                this.edgeData[i + B] = nodeMetadata["branch_color"][BLUE]
+                i += VERT_SIZE;
+              }
+            }
+
         }
     }
   }

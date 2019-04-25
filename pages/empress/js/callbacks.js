@@ -677,3 +677,30 @@ function downloadLinks(clsID) {
 function downloadSubtree(clsID) {
     downloadText(tree.toNewick(clsID) + ";", clsID + ".nwk");
 }
+
+function changeLayout(layout) {
+
+  let layoutChecked = $(layout).is(":checked");
+  if(!layoutChecked) $(layout).attr("checked", true);
+  var layouts = $("input:radio.layout");
+  console.log(layouts);
+  for(var i = 0; i < layouts.length; ++i){
+    if(layouts[i]!=layout){
+      $(layouts[i]).attr("checked", false);
+    }
+  }
+  tree.layout = layout;
+  tree.edgeData = tree.edgeData_dict[layout];
+  tree.max = tree.maxes.dim_circ;
+  tree.numBranches = tree.edgeData.length;
+
+  drawingData.nodeCoords = [0, 0, 0, 0, 0];
+  drawingData.highTri = [];
+  drawingData.numBranches = tree.edgeData.length;
+  console.log(drawingData.numBranches);
+  drawingData.initZoom = tree.max;
+  drawingData.currentZoom = drawingData.initZoom;
+
+  fillBufferData(shaderProgram.treeVertBuffer, tree.edgeData);
+  requestAnimationFrame(loop);
+}
