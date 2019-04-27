@@ -985,7 +985,6 @@ function changeLayout(layout) {
   console.log(tree.layout);
   tree.updateEdgeData(0);
   tree.max = tree.getMax();
-  tree.numBranches = tree.edgeData.length;
 
   drawingData.nodeCoords = [0, 0, 0, 0, 0];
   drawingData.highTri = [];
