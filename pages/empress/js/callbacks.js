@@ -104,11 +104,12 @@ function nodeHover(x, y) {
   let clsXTC, clsYTC, clsID;
   let close = 1000;
   let tmp;
-  let xDist, yDist, treeX, treeY, nScreenX, nScreenY, treeSpace, screenSpace;
+  let xDist, yDist, treeX, treeY, nScreenX, nScreenY, treeSpace, screenSpace, treeCoord;
   let canvas = $(".tree-surface")[0];
   for (id in tree.tree) {
-    treeX = tree.tree[id].x;
-    treeY = tree.tree[id].y;
+    treeCoord = tree.getCoordinateByID(id);
+    treeX = treeCoord[0];
+    treeY = treeCoord[1];
 
     // calculate the screen coordinate of the label
     treeSpace = vec4.fromValues(treeX, treeY, 0, 1);
@@ -134,7 +135,7 @@ function nodeHover(x, y) {
   // generate hover box
   let box = document.getElementById("hover-box");
   box.classList.add("hidden");
-
+ console.log(clsID);
   if (close <= 50 && (clsID === "N1" || tree.metadata[clsID]["branch_is_visible"])) {
     drawingData.hoveredNode = [clsXTC, clsYTC, 0, 1, 0];
 
@@ -972,19 +973,18 @@ function downloadSubtree(clsID) {
 
 
 function changeLayout(layout) {
-
   let layoutChecked = $(layout).is(":checked");
   if(!layoutChecked) $(layout).attr("checked", true);
-  var layouts = $("input:radio.layout");
-  console.log(layouts);
+  var layouts = $("input[name='l']");
   for(var i = 0; i < layouts.length; ++i){
-    if(layouts[i]!=layout){
-      $(layouts[i]).attr("checked", false);
+    if(layouts[i]["id"]!=layout){
+      $(layouts[i]["id"]).attr("checked", false);
     }
   }
   tree.layout = layout;
-  tree.edgeData = tree.edgeData_dict[layout];
-  tree.max = tree.maxes.dim_circ;
+  console.log(tree.layout);
+  tree.updateEdgeData(0);
+  tree.max = tree.getMax();
   tree.numBranches = tree.edgeData.length;
 
   drawingData.nodeCoords = [0, 0, 0, 0, 0];
@@ -996,6 +996,7 @@ function changeLayout(layout) {
 
   fillBufferData(shaderProgram.treeVertBuffer, tree.edgeData);
   requestAnimationFrame(loop);
+}
 
 
 /**
@@ -1107,5 +1108,4 @@ function toastMsg(msg, duration) {
   setTimeout(function(){
     toast.classList.add("hidden");
   }, duration);
-
 }

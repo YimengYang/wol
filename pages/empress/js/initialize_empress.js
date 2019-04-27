@@ -11,13 +11,18 @@ function initialize(){
   drawingData.currentZoom = drawingData.initZoom;
 
   // Fill 'Tip color' drop down menu
-  fillDropDownMenu(tree.headers.general, "#tip-color-options");
+  /*fillDropDownMenu(tree.headers.general, "#tip-color-options");
+  console.log('Start')
   fillDropDownMenu(tree.headers.tip_cat, "#tip-color-options");
+  console.log('Start')
   fillDropDownMenu(tree.headers.tip_num, "#tip-color-options");
+  console.log('Start')
 
   // File 'Node color' drop down menu
   fillDropDownMenu(tree.headers.general, "#branch-color-options");
+  console.log('Start')
   fillDropDownMenu(tree.headers.node_headers, "#branch-color-options");
+  console.log('Start')*/
 
   // TODO: create clade coloring drop box
   // fillDropDownMenu(tree.m_headers.all, '#clade-options');
@@ -26,7 +31,7 @@ function initialize(){
 
   // intializes webgl and creates callback events for users inputs
   initWebGl(tree.edgeData);
-  //console.log("after webgl");
+  console.log("after webgl");
   initCallbacks();
   //console.log("after callback");
   setPerspective();

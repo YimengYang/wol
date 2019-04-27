@@ -1,20 +1,25 @@
 class Tree{
-  constructor(tree_nwk, edgeData, edgeData_circ, metadata, headers, maxes){
+  constructor(tree_nwk, metadata, headers, maxes){
     this.layout = "radial";
     this.tree = tree_nwk;
-    this.edgeData = edgeData;
-    this.edgeData_circ = edgeData_circ;
+    this.edgeData = [];
+    this.numBranches = 206020;
+
     this.metadata = metadata;
     this.headers = headers;
     this.max = maxes.dim;
     this.maxes = maxes;
     this.root = 'N1';
-    this.edgeData_dict = {"radial": edgeData, "circular": edgeData_circ};
-    //this.numBranches = 1000000;
-    this.numBranches = edgeData.length;
+
+
+    //this.numBranches = this.edgeData.length;
+    //console.log(this.numBranches);
     this.triData = [];
     this.triRoots = [];
     this.lastHighTri = 0;
+    this.updateEdgeData(0);
+
+
   }
 
   order(pre, start, include_self, tip=false){
@@ -155,6 +160,7 @@ class Tree{
   }
 
   collapse(taxLevel, taxPrefix) {
+    let prefix = this.layout.charAt(0) + "_";
     const RED = 0;
     const GREEN = 1;
     const BLUE = 2;
@@ -179,8 +185,8 @@ class Tree{
             }
             rootNode = this.tree[node];
             theta = rootNode['starting_angle'];
-            rx = rootNode["x"];
-            ry = rootNode["y"];
+            rx = rootNode[prefix+"x"];
+            ry = rootNode[prefix+"y"];
             tlX = rootNode["largest_branch"] * Math.cos(theta) + rx;
             tlY = rootNode["largest_branch"] * Math.sin(theta) + ry;
             theta += rootNode["theta"];
@@ -226,6 +232,7 @@ class Tree{
   }
 
   updateEdgeData(numNotVis) {
+    let prefix = this.layout.charAt(0)+"_";
     let i = 0;
     let node;
     const VERT_SIZE = 10;
@@ -249,23 +256,28 @@ class Tree{
     let nodeMetadata;
     this.edgeData = new Array((this.numBranches ) * VERT_SIZE);
     for(node in this.metadata) {
-        nodeMetadata = this.metadata[n\ode];
+
+        nodeMetadata = this.metadata[node];
         if(nodeMetadata['branch_is_visible']) {
-            this.edgeData[i + PX] = nodeMetadata["px"];
-            this.edgeData[i + PY] = nodeMetadata["py"];
+
+            this.edgeData[i + PX] = nodeMetadata[prefix+"px"];
+            this.edgeData[i + PY] = nodeMetadata[prefix+"py"];
             this.edgeData[i + PR] = nodeMetadata["branch_color"][RED];
             this.edgeData[i + PG] = nodeMetadata["branch_color"][GREEN];
             this.edgeData[i + PB] = nodeMetadata["branch_color"][BLUE];
-            this.edgeData[i + X] = nodeMetadata["x"];
-            this.edgeData[i + Y] = nodeMetadata["y"];
+            this.edgeData[i + X] = nodeMetadata[prefix+"x"];
+            this.edgeData[i + Y] = nodeMetadata[prefix+"y"];
             this.edgeData[i + R] = nodeMetadata["branch_color"][RED];
             this.edgeData[i + G] = nodeMetadata["branch_color"][GREEN]
             this.edgeData[i + B] = nodeMetadata["branch_color"][BLUE]
             i += VERT_SIZE;
             // Add segments as well
-            if(nodeMetadata["segments"].length != 0){
+            //console.log(nodeMetadata["c_segments"]);
+            if(this.layout=="circular" && nodeMetadata["c_segments"].length != 0){
+              //console.log("segments");
               let seg;
-              for (seg in nodeMetadata["segments"]){
+              for (var j = 0; j < nodeMetadata["c_segments"].length; ++j){
+                seg = nodeMetadata["c_segments"][j];
                 this.edgeData[i + PX] = seg[SEGX2];
                 this.edgeData[i + PY] = seg[SEGY2];
                 this.edgeData[i + PR] = nodeMetadata["branch_color"][RED];
@@ -285,14 +297,15 @@ class Tree{
   }
 
   getTaxonLabels(taxLevel, tips, taxPrefix, sort) {
+    let prefix = this.layout.charAt(0)+"_";
     let labels = [];
     let node;
     for(node in this.metadata) {
       if(this.metadata[node][taxPrefix + taxLevel] != null
             && this.tree[node]["is_tip"] === tips
             && this.metadata[node]["branch_is_visible"]) {
-        labels.push([this.metadata[node]["x"],
-                         this.metadata[node]["y"],
+        labels.push([this.metadata[node][prefix+"x"],
+                         this.metadata[node][prefix+"y"],
                          this.metadata[node][taxLevel],
                          this.tree[node]["leafcount"],
                          node]);
@@ -598,6 +611,23 @@ class Tree{
       result.push(this.toNewick(child));
     }
     return '(' + result.join(',') + ')' + resultStr;
+  }
+
+ /**
+  * Get the coordinates given the id of a node
+  */
+  getCoordinateByID(nodeId, parent=false){
+    let prefix = this.layout.charAt(0) + "_";
+    if(parent){
+      prefix += "p";
+    }
+    if(nodeId == this.root) return [this.tree[nodeId].x, this.tree[nodeId].y]
+    return [this.metadata[nodeId][prefix+"x"], this.metadata[nodeId][prefix+"y"]]
+  }
+
+  getMax(){
+    if(this.layout == "radial") return this.maxes.dim;
+    if(this.layout == "circular") return this.maxes.dim_circ;
   }
 
 }
