@@ -994,6 +994,7 @@ function changeLayout(layout) {
   drawingData.currentZoom = drawingData.initZoom;
 
   fillBufferData(shaderProgram.treeVertBuffer, tree.edgeData);
+  placeCamera(drawingData.initZoom); 
   requestAnimationFrame(loop);
 }
 
